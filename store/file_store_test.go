@@ -4,8 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"github.com/czh0526/kms/key"
 )
 
 func TestFileStore(t *testing.T) {
@@ -17,7 +15,7 @@ func TestFileStore(t *testing.T) {
 
 	store := NewFileStore(dir)
 
-	keyPair := &key.KeyPair{
+	keyPair := &KeyPair{
 		Address:    "test_address",
 		PrivateKey: "test_private_key",
 		PublicKey:  "test_public_key",

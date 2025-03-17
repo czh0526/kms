@@ -3,7 +3,6 @@ package store
 import (
 	"testing"
 
-	"github.com/czh0526/kms/key"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -21,7 +20,7 @@ func TestDBStore(t *testing.T) {
 	// Auto migrate the KeyPair model
 	db.AutoMigrate(&KeyPair{})
 
-	keyPair := &key.KeyPair{
+	keyPair := &KeyPair{
 		Address:    "test_address",
 		PrivateKey: "test_private_key",
 		PublicKey:  "test_public_key",

@@ -13,7 +13,7 @@ import (
 	"github.com/tjfoc/gmsm/sm2"
 )
 
-type AsymKey interface {
+type KmsKey interface {
 	Sign(data []byte) ([]byte, error)
 	Verify(data []byte, signature []byte) (bool, error)
 }
@@ -29,7 +29,7 @@ type Key struct {
 	sm2Key  *sm2.PrivateKey
 }
 
-func NewKey(keyType string, key any) (*Key, error) {
+func NewKmsKey(keyType string, key any) (*Key, error) {
 	switch keyType {
 	case KeyType_ECDSA:
 		ecKey, ok := key.(*ecdsa.PrivateKey)
@@ -55,22 +55,28 @@ func NewKey(keyType string, key any) (*Key, error) {
 	return nil, fmt.Errorf("unsupported key type: %v", keyType)
 }
 
-func LoadECDSAKey(pemData []byte) (AsymKey, error) {
-	ecPrivateKey, err := kms_ecdsa.LoadPrivateKey(pemData)
-	if err != nil {
-		return nil, err
+func LoadKmsKey(keyType string, pemData []byte) (KmsKey, error) {
+	var err error
+
+	switch keyType {
+	case KeyType_ECDSA:
+		var ecPrivateKey *ecdsa.PrivateKey
+		if ecPrivateKey, err = kms_ecdsa.LoadPrivateKey(pemData); err != nil {
+			return nil, fmt.Errorf("failed to load ECDSA key, err = %v", err)
+		}
+
+		return NewKmsKey(KeyType_ECDSA, ecPrivateKey)
+
+	case KeyType_SM2:
+		var sm2PrivateKey *sm2.PrivateKey
+		if sm2PrivateKey, err = kms_sm2.LoadPrivateKey(pemData); err != nil {
+			return nil, fmt.Errorf("failed to load SM2 key, err = %v", err)
+		}
+
+		return NewKmsKey(KeyType_SM2, sm2PrivateKey)
 	}
 
-	return NewKey(KeyType_ECDSA, ecPrivateKey)
-}
-
-func LoadSM2Key(pemData []byte) (AsymKey, error) {
-	sm2PrivateKey, err := kms_sm2.LoadPrivateKey(pemData)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewKey(KeyType_SM2, sm2PrivateKey)
+	return nil, fmt.Errorf("unsupported key type: %v", keyType)
 }
 
 type ecdsaSignature struct {

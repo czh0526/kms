@@ -22,4 +22,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create key store: %v", err)
 	}
+
+	fmt.Printf("Created key store: %+v\n", keyStore)
 }

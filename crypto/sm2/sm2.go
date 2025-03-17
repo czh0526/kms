@@ -17,7 +17,7 @@ func GenerateSM2Key() (*sm2.PrivateKey, error) {
 // LoadPrivateKey 从 PEM 格式的字符串中加载 SM2 私钥
 func LoadPrivateKey(pemData []byte) (*sm2.PrivateKey, error) {
 	block, _ := pem.Decode(pemData)
-	if block == nil || block.Type != "PRIVATE KEY" {
+	if block == nil || block.Type != "SM2 PRIVATE KEY" {
 		return nil, errors.New("failed to decode PEM block containing private key")
 	}
 
