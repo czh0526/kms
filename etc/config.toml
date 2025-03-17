@@ -1,7 +1,0 @@
-# KeyStore 配置
-file_store:
-  path: "/path/to/keystore"
-
-dn_store:
-  type: mysql
-  dsn: 

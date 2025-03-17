@@ -3,7 +3,6 @@ package store
 import (
 	"fmt"
 
-	"github.com/czh0526/kms/keypair"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -19,14 +18,14 @@ func NewDBStore(dsn string) *DBStore {
 }
 
 // Save 保存密钥对到数据库
-func (s *DBStore) Save(keyPair *keypair.KeyPair) error {
+func (s *DBStore) Save(keyPair *KeyPair) error {
 	db, err := gorm.Open(mysql.Open(s.dsn), &gorm.Config{})
 	if err != nil {
 		return err
 	}
 
 	// 自动迁移模式
-	db.AutoMigrate(&keypair.KeyPair{})
+	db.AutoMigrate(&KeyPair{})
 
 	if err := db.Create(keyPair).Error; err != nil {
 		return err
@@ -37,13 +36,13 @@ func (s *DBStore) Save(keyPair *keypair.KeyPair) error {
 }
 
 // Load 从数据库加载密钥对
-func (s *DBStore) Load(address string) (*keypair.KeyPair, error) {
+func (s *DBStore) Load(address string) (*KeyPair, error) {
 	db, err := gorm.Open(mysql.Open(s.dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
-	var keyPair keypair.KeyPair
+	var keyPair KeyPair
 	if err := db.First(&keyPair, "address = ?", address).Error; err != nil {
 		return nil, err
 	}
@@ -58,7 +57,7 @@ func (s *DBStore) Delete(address string) error {
 		return err
 	}
 
-	if err := db.Delete(&keypair.KeyPair{}, "address = ?", address).Error; err != nil {
+	if err := db.Delete(&KeyPair{}, "address = ?", address).Error; err != nil {
 		return err
 	}
 
