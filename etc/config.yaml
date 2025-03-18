@@ -1,9 +1,9 @@
 # KeyStore 配置
-StoreType: "FileStore"
+StoreType: "DbStore"
 
 FileStore:
   Path: "/Users/zhihongcai/.kms/key-store"
 
 DbStore:
   DbType: "mysql"
-  DSN: "root:passw0rd@tcp(localhost:3306)/kms_db?parseTime=true&loc=Local&time_zone=%27%2B08%3A00%27"
+  DSN: "root:123456@tcp(localhost:3306)/kms_db?parseTime=true&loc=Local&time_zone=%27%2B08%3A00%27"

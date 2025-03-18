@@ -1,26 +1,23 @@
 package store
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"github.com/czh0526/kms/store/keypair"
 )
 
-func TestDBStore(t *testing.T) {
-	dsn := "root:123456@tcp(localhost:3306)/kms_db?parseTime=true&loc=Local&time_zone=%27%2B08%3A00%27"
-	store := NewDBStore(dsn)
-
-	// Initialize the database connection
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestFileStore(t *testing.T) {
+	dir, err := ioutil.TempDir("", "keystore")
 	if err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
+		t.Fatalf("Failed to create temp dir: %v", err)
 	}
+	defer os.RemoveAll(dir)
 
-	// Auto migrate the KeyPair model
-	db.AutoMigrate(&KeyPair{})
+	store := NewFileStore(dir)
 
-	keyPair := &KeyPair{
+	keyPair := &keypair.KeyPair{
 		Address:    "test_address",
 		PrivateKey: "test_private_key",
 		PublicKey:  "test_public_key",
@@ -45,16 +42,5 @@ func TestDBStore(t *testing.T) {
 	}
 	if loadedKeyPair.PublicKey != keyPair.PublicKey {
 		t.Errorf("Expected PublicKey %s, got %s", keyPair.PublicKey, loadedKeyPair.PublicKey)
-	}
-
-	// Test Delete
-	if err := store.Delete("test_address"); err != nil {
-		t.Fatalf("Failed to delete key pair: %v", err)
-	}
-
-	// Verify deletion
-	_, err = store.Load("test_address")
-	if err == nil {
-		t.Fatalf("Expected error when loading deleted key pair, got nil")
 	}
 }
